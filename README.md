@@ -88,9 +88,3 @@ esphome:
   platformio_options:
     board_build.arduino.memory_type: qio_opi
 ```
-
-## Further development
-
-I'll use HA Deck to build per-room dashboards in my apartment. So, for sure, fixes and additional widgets (e.g., to control warm floors) will be added.
-
-But overall, the approach implemented here isn't correct and goes against ESPHome's architecture. Additionally, it has many limitations, including no support for user-defined images and fonts. Currently, [Clyde Stubbs](https://github.com/clydebarrow) is working on bringing LVGL support to ESPHome in the correct way (through the display component). After this is done (including further performance improvements in the ESPHome display part), the HA Deck may become useless. If not, I'll consider migrating it to use the display component.
