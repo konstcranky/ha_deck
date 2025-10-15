@@ -1,10 +1,15 @@
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua)
 
+> [!IMPORTANT]
+>
+> This is an outdated component, originally developed when it wasn’t possible to use LVGL natively. It will most likely stop working after the ESPHome 2025.10 update (Arduino as an IDF component). Recommended alternatives: native LVGL or [Remote WebView](https://github.com/strange-v/RemoteWebViewClient).
+
 # Home Assistant Deck
 
 Config-driven Home Assistant dashboard (built on top of ESPHome using LVGL).
 
 ![HA Deck dashboard exampl](/images/ha_deck.jpg)
+
 [Demo video](https://www.youtube.com/watch?v=NPr9ryyTVB4)
 
 ## How it works
