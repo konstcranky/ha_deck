@@ -4,7 +4,7 @@
 >
 > This is an outdated component, originally developed when it wasn’t possible to use LVGL natively. It will most likely stop working after the ESPHome 2025.10 update (Arduino as an IDF component).
 >
-> Recommended alternatives: native LVGL or [Remote WebView](https://github.com/strange-v/RemoteWebViewClient).
+> Recommended alternatives: [native LVGL](https://esphome.io/components/lvgl/) or [Remote WebView](https://github.com/strange-v/RemoteWebViewClient).
 
 # Home Assistant Deck
 
