@@ -44,6 +44,7 @@ void HaDeck::set_main_screen(std::string value) {
 void HaDeck::add_screen(HaDeckScreen *screen) {
     ESP_LOGD(this->TAG, "add_screen: %s", screen->get_name().c_str());
     screens_[screen->get_name()] = screen;
+    screen_order_.push_back(screen->get_name());
 }
 
 void HaDeck::switch_screen(std::string name) {
@@ -63,6 +64,34 @@ void HaDeck::switch_screen(std::string name) {
     inactivity_timeout_ = active_screen_->get_inactivity() > 0
         ? active_screen_->get_inactivity()
         : inactivity_timeout_default_;
+}
+
+std::string HaDeck::get_active_screen() {
+    return active_screen_ ? active_screen_->get_name() : std::string();
+}
+
+size_t HaDeck::current_screen_index_() {
+    if (active_screen_) {
+        for (size_t i = 0; i < screen_order_.size(); i++) {
+            if (screen_order_[i] == active_screen_->get_name())
+                return i;
+        }
+    }
+    return 0;
+}
+
+void HaDeck::next_screen() {
+    if (screen_order_.empty())
+        return;
+    size_t index = (current_screen_index_() + 1) % screen_order_.size();
+    switch_screen(screen_order_[index]);
+}
+
+void HaDeck::previous_screen() {
+    if (screen_order_.empty())
+        return;
+    size_t index = (current_screen_index_() + screen_order_.size() - 1) % screen_order_.size();
+    switch_screen(screen_order_[index]);
 }
 
 void HaDeck::add_on_inactivity_change_callback(std::function<void(bool)> &&callback) {

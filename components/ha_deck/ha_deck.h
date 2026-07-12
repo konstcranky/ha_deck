@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <vector>
 #include <string>
 #include "ha_deck_screen.h"
 
@@ -19,10 +20,14 @@ public:
     bool get_inactivity();
     void add_screen(HaDeckScreen *screen);
     void switch_screen(std::string name);
+    std::string get_active_screen();
+    void next_screen();
+    void previous_screen();
     void add_on_inactivity_change_callback(std::function<void(bool)> &&callback);
 private:
     void set_inactivity_(bool value);
     void create_inactivity_screen_();
+    size_t current_screen_index_();
 
     const char *TAG = "HA_DECK";
     std::string main_screen_name_;
@@ -33,6 +38,7 @@ private:
     bool inactivity_ = false;
 
     std::map<std::string, HaDeckScreen*> screens_ = {};
+    std::vector<std::string> screen_order_ = {};
     HaDeckScreen *active_screen_ = nullptr;
     lv_obj_t *lvgl_main_screen_ = nullptr;
     lv_obj_t *lvgl_inactivity_screen_ = nullptr;
