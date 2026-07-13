@@ -12,8 +12,10 @@ public:
     void set_icon(std::string icon);
     void set_toggle(bool toggle);
     bool is_checked();
+    void update_checked_force();
 
     void add_checked_lambda(std::function<optional<bool>()> &&f);
+    void add_icon_lambda(std::function<optional<std::string>()> &&f);
     void add_on_click_callback(std::function<void()> &&callback);
     void add_on_turn_on_callback(std::function<void()> &&callback);
     void add_on_turn_off_callback(std::function<void()> &&callback);
@@ -29,6 +31,7 @@ private:
     static void on_long_press_(lv_event_t *e);
     static void on_released_(lv_event_t *e);
     
+    void set_icon_(std::string text);
     void set_checked_(bool enabled);
 
     const char *TAG = "HD_BUTTON";
@@ -38,8 +41,10 @@ private:
     std::string text_;
     std::string icon_;
     lv_obj_t *button_;
+    lv_obj_t *icon_obj_;
 
     std::function<optional<bool>()> checked_fn_ = nullptr;
+    std::function<optional<std::string>()> icon_fn_ = nullptr;
     CallbackManager<void()> click_callback_{};
     CallbackManager<void()> turn_on_callback_{};
     CallbackManager<void()> turn_off_callback_{};

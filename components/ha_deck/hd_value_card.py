@@ -25,7 +25,7 @@ CONF_ON_CLICK = "on_click"
 VALUE_CARD_CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(CONF_ID): cv.declare_id(HdValueCard),
-        cv.Optional(CONF_TEXT): cv.string,
+        cv.Optional(CONF_TEXT): cv.Any(cv.returning_lambda, cv.string),
         cv.Optional(CONF_ICON): cv.string,
         cv.Optional(CONF_UNIT): cv.string,
         cv.Optional(CONF_VALUE): cv.returning_lambda,
@@ -39,7 +39,15 @@ VALUE_CARD_CONFIG_SCHEMA = cv.Schema(
 
 async def build_value_card(var, config):
     if text := config.get(CONF_TEXT):
-        cg.add(var.set_text(text))
+        if isinstance(text, cv.Lambda):
+            val = await cg.process_lambda(text, [], return_type=cg.optional.template(cg.std_string))
+            cg.add(var.add_text_lambda(val))
+        else:
+            try:
+                val = await cg.process_lambda(text, [], return_type=cg.optional.template(cg.std_string))
+                cg.add(var.add_text_lambda(val))
+            except:
+                cg.add(var.set_text(text))
 
     if icon := config.get(CONF_ICON):
         cg.add(var.set_icon(icon))

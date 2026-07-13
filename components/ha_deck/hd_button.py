@@ -42,7 +42,7 @@ BUTTON_CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(CONF_ID): cv.declare_id(HdButton),
         cv.Optional(CONF_TEXT): cv.string,
-        cv.Optional(CONF_ICON): cv.string,
+        cv.Optional(CONF_ICON): cv.Any(cv.returning_lambda, cv.string),
         cv.Optional(CONF_TOGGLE): cv.boolean,
         cv.Optional(CONF_CHECKED): cv.returning_lambda,
         cv.Optional(CONF_ON_CLICK): automation.validate_automation(
@@ -71,8 +71,19 @@ BUTTON_CONFIG_SCHEMA = cv.Schema(
 async def build_button(var, config):
     if text := config.get(CONF_TEXT):
         cg.add(var.set_text(text))
+
     if icon := config.get(CONF_ICON):
-        cg.add(var.set_icon(icon))
+        # cg.add(var.set_icon(icon))
+        if isinstance(icon, cv.Lambda):
+            val = await cg.process_lambda(icon, [], return_type=cg.optional.template(cg.std_string))
+            cg.add(var.add_icon_lambda(val))
+        else:
+            try:
+                val = await cg.process_lambda(icon, [], return_type=cg.optional.template(cg.std_string))
+                cg.add(var.add_icon_lambda(val))
+            except:
+                cg.add(var.set_icon(icon))
+
     if toggle := config.get(CONF_TOGGLE):
         cg.add(var.set_toggle(toggle))
     

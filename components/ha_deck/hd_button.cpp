@@ -8,7 +8,7 @@ void HdButton::set_text(std::string text) {
 }
 
 void HdButton::set_icon(std::string icon) {
-    icon_ = icon;
+    set_icon_(icon);
 }
 
 void HdButton::set_toggle(bool toggle) {
@@ -19,8 +19,32 @@ bool HdButton::is_checked() {
     return checked_;
 }
 
+void HdButton::set_icon_(std::string icon) {
+    icon_ = icon;
+
+    if (!button_)
+    return;
+
+    if (icon_obj_)
+        lv_label_set_text(icon_obj_, icon_.c_str());
+}
+
+void HdButton::update_checked_force() {
+    if (this->checked_fn_) {
+        auto s = this->checked_fn_();
+        // if (s.has_value()) {
+            // this->set_checked_(s.value());
+        // }
+        this->set_checked_(!(this->checked_));
+    }
+}
+
 void HdButton::add_checked_lambda(std::function<optional<bool>()> &&f) {
     checked_fn_ = f;
+}
+
+void HdButton::add_icon_lambda(std::function<optional<std::string>()> &&f) {
+    icon_fn_ = f;
 }
 
 void HdButton::add_on_click_callback(std::function<void()> &&callback) {
@@ -40,7 +64,6 @@ void HdButton::add_on_long_press_callback(std::function<void()> &&callback) {
 }
 
 void HdButton::render_() {
-    lv_obj_t *icon;
     lv_obj_t *label;
 
     button_ = lv_btn_create(lv_scr_act());
@@ -59,8 +82,8 @@ void HdButton::render_() {
     lv_obj_set_style_shadow_width(button_, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(button_, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(button_, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(button_, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(button_, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(button_, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(button_, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_radius(button_, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(button_, lv_color_hex(0x999999), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(button_, 25, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -81,14 +104,14 @@ void HdButton::render_() {
     bool has_icon = icon_ != "";
 
     if (has_icon) {
-        icon = lv_label_create(button_);
-        lv_obj_set_width(icon, 48);
-        lv_obj_set_height(icon, 48);
-        lv_obj_set_style_bg_color(icon, lv_color_hex(0xff0000), LV_PART_MAIN | LV_STATE_DISABLED);
-        lv_obj_set_align(icon, has_text ? LV_ALIGN_TOP_MID : LV_ALIGN_CENTER);
-        lv_label_set_text(icon, icon_.c_str());
-        lv_obj_set_style_text_align(icon, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_font(icon, &Material48, LV_PART_MAIN | LV_STATE_DEFAULT);
+        icon_obj_ = lv_label_create(button_);
+        lv_obj_set_width(icon_obj_, 48);
+        lv_obj_set_height(icon_obj_, 48);
+        lv_obj_set_style_bg_color(icon_obj_, lv_color_hex(0xff0000), LV_PART_MAIN | LV_STATE_DISABLED);
+        lv_obj_set_align(icon_obj_, has_text ? LV_ALIGN_TOP_MID : LV_ALIGN_CENTER);
+        lv_label_set_text(icon_obj_, icon_.c_str());
+        lv_obj_set_style_text_align(icon_obj_, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(icon_obj_, &Material48, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
 
     if (has_text) {
@@ -118,6 +141,13 @@ void HdButton::update_() {
         auto s = this->checked_fn_();
         if (s.has_value() && s.value() != this->checked_) {
             this->set_checked_(s.value());
+        }
+    }
+
+    if (this->icon_fn_) {
+        auto s = this->icon_fn_();
+        if (s.has_value() && s.value() != this->icon_) {
+            this->set_icon_(s.value());
         }
     }
 }
